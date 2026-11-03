@@ -1,10 +1,15 @@
 package service
 
 import (
+	"time"
+	"crypto/rand"
+	"encoding/base64"
 	"splitify/db"
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+const EXPIRY_DURATION = 1 * time.Minute
 
 type AuthService interface {
 	Register(username string, password string) (bool, error)
@@ -13,12 +18,14 @@ type AuthService interface {
 }
 
 type authService struct {
-	loginRepo db.LoginRepo
+	userRepo db.UserRepo
+	sessionRepo db.SessionRepo
 }
 
-func NewAuthService(loginRepo db.LoginRepo) AuthService {
+func NewAuthService(loginRepo db.UserRepo, sessionRepo db.SessionRepo) AuthService {
 	return &authService{
-		loginRepo: loginRepo,
+		userRepo: loginRepo,
+		sessionRepo: sessionRepo,
 	}
 }
 
@@ -30,16 +37,16 @@ func (h *authService) Register(username string, password string) (bool, error) {
 		return false, err
 	}
 
-	success, err := h.loginRepo.Insert(username, string(hashed))
+	_, err = h.userRepo.Insert(username, string(hashed))
 	if err != nil {
 		return false, err
 	}
 
-	return success, nil
+	return true, nil
 }
 
 func (h *authService) Login(username string, password string) (bool, string, error) {
-	actual, err := h.loginRepo.Select(username)
+	actual, err := h.userRepo.SelectByUsername(username)
 	if err != nil {
 		return false, "", err
 	}
@@ -49,18 +56,41 @@ func (h *authService) Login(username string, password string) (bool, string, err
 		return false, "", nil
 	}
 
-	token, err := getToken(username)
-	return true, token, nil
+	token, err := getToken()
+
+	success, err := h.sessionRepo.Insert(token, actual.Id, time.Now().Add(EXPIRY_DURATION))
+	if err != nil {
+		return false, "", nil
+	}
+
+	return success, token, nil
 }
 
-// TODO: [M] Implement token generation and verification service for secure encoded user token
-func getToken(_ string) (string, error) {
-	return "token", nil
+func getToken() (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+	token := base64.URLEncoding.EncodeToString(b)
+
+	return token, nil
 }
 
 func (h *authService) Verify(token string) (bool, int, error) {
-	if token == "token" {
-		return true, 66, nil
+	sess, found, err := h.sessionRepo.Select(token)
+	if err != nil {
+		return false, -1, err
 	}
-	return false, -1, nil
+
+	if !found {
+		return false, -1, nil
+	}
+
+	if time.Now().After(sess.Expiry) {
+		h.sessionRepo.Delete(token)
+		return false, -1, nil
+	}
+
+	return true, sess.UserId, nil
 }

@@ -1,5 +1,7 @@
 package db
 
+import "time"
+
 type Group struct {
 	Id int
 	Name string
@@ -7,11 +9,6 @@ type Group struct {
 
 type User struct {
 	Id int
-	Username string
-	DisplayName string
-}
-
-type Login struct {
 	Username string
 	Password string
 }
@@ -30,4 +27,10 @@ type Transaction struct {
 	Category string
 	Amount int
 	Split string
+}
+
+type Session struct {
+	Token string
+	UserId int
+	Expiry time.Time
 }
