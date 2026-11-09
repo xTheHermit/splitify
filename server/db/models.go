@@ -19,6 +19,7 @@ type GroupMembership struct {
 	Balance int
 }
 
+// TODO
 type Transaction struct {
 	Id int
 	GroupId int

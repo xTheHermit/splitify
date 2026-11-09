@@ -82,7 +82,7 @@ type ServerInterface interface {
 	// (GET /api/groups/{id})
 	GetGroup(c *gin.Context, id int)
 
-	// (PUT /api/groups/{id})
+	// (PATCH /api/groups/{id})
 	UpdateGroup(c *gin.Context, id int)
 }
 
@@ -255,7 +255,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/api/groups", wrapper.CreateGroup)
 	router.DELETE(options.BaseURL+"/api/groups/:id", wrapper.DeleteGroup)
 	router.GET(options.BaseURL+"/api/groups/:id", wrapper.GetGroup)
-	router.PUT(options.BaseURL+"/api/groups/:id", wrapper.UpdateGroup)
+	router.PATCH(options.BaseURL+"/api/groups/:id", wrapper.UpdateGroup)
 }
 
 // Base64 encoded, compressed with deflate, json marshaled OpenAPI spec.
@@ -275,8 +275,8 @@ var swaggerSpec = []string{
 	"1XkaZALJRMUc3elicYyMIc50517tEvj+IS5z1+quZCFbsaRl6VngL1uqYM3rY/rdbtnOKmAo7CcSwYD/",
 	"pTr4t/JchibCm5Q4w+8bpF+2sdHAfLiPwvNOKwtEH+Xwiwi5o6CPh3vovKouHErCYPZUwuo78YNV9Xg0",
 	"38PwP63SSVL2lZneqqKLZVUj4TRXP4b3Y672qDt97II8XfwwhbwwelOrnE4ED4niwuhC8ZLYSFVj8RS6",
-	"PVasR3j4j0mIZwknG6TQd1f9BMTzxTj/hLlnv/R2e+5kHFsnYNsZ0n+zxf93xVe7K/bb3GT2Xa27sfUd",
-	"lm1AEY3UssSGv+levrv0o0D6Tbrk0I87KGrqaT3w4kX+PPtrAA==",
+	"PVasR3j4j0mIZwknG6TQd1f9BMTzxTj/hLlnv/R2e+5kHFszKOXVlPbfbPH/bfHVbov9RjeZflfrbmx+",
+	"h4UbUEQjtSyx4a+6l+8u/SiRfpMuOfTjHoqaeloPvHiRP9D+GgA=",
 }
 
 // decodeSpec returns the embedded OpenAPI spec as raw JSON bytes,

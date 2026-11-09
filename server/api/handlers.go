@@ -117,7 +117,7 @@ func (h *Server) GetGroup(c *gin.Context, id int) {
 	})
 }
 
-// (PUT /api/groups/{id})
+// (PATCH /api/groups/{id})
 func (h *Server) UpdateGroup(c *gin.Context, id int) {
 	var input UpdateGroupJSONRequestBody
 	if err := c.Bind(&input); err != nil {

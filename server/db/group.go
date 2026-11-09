@@ -17,7 +17,9 @@ func newGroupRepo(db *sql.DB) (GroupRepo, error) {
 	ctx, cancel := getStandardContext()
 	defer cancel()
 
-	_, err := db.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS user_group(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);")
+	_, err := db.ExecContext(ctx, "CREATE TABLE IF NOT EXISTS user_group(" +
+															"id INTEGER PRIMARY KEY AUTOINCREMENT," +
+															"name TEXT);")
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +33,8 @@ func (h *groupRepo) Select(id int) (Group, error) {
 	defer cancel()
 
 	var ans Group
-	err := h.db.QueryRowContext(ctx, "SELECT id, name FROM user_group WHERE id = $1", id).Scan(&ans.Id, &ans.Name)
+	err := h.db.QueryRowContext(ctx, "SELECT id, name FROM user_group WHERE id = $1", id).
+				Scan(&ans.Id, &ans.Name)
 	if err != nil {
 		return Group{}, err
 	}
