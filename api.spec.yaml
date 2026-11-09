@@ -119,7 +119,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-    put:
+    patch:
       tags:
         - Groups
       operationId: updateGroup
